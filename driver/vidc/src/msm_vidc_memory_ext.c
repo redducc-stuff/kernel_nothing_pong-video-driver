@@ -362,7 +362,12 @@ static u32 msm_vidc_buffer_region_ext(struct msm_vidc_inst *inst,
 
 		switch (buffer_type) {
 		case MSM_VIDC_BUF_ARP:
+#ifdef CONFIG_MSM_VIDC_WAIPIO
+			/* iris2 fw always reaches the encoder ARP through the non-pixel CP stream */
+			region = MSM_VIDC_SECURE_NONPIXEL;
+#else
 			region = MSM_VIDC_NON_SECURE;
+#endif
 			break;
 		case MSM_VIDC_BUF_INPUT:
 			if (is_encode_session(inst))
