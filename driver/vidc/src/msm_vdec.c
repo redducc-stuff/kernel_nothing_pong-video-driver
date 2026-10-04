@@ -1164,6 +1164,10 @@ int msm_vdec_subscribe_metadata(struct msm_vidc_inst *inst,
 		return -EINVAL;
 	}
 
+	/* iris2 firmware rejects an empty input port metadata subscription */
+	if (port == INPUT_PORT && !count)
+		return 0;
+
 	rc = msm_vidc_session_command(inst,
 			HFI_CMD_SUBSCRIBE_MODE,
 			port,
