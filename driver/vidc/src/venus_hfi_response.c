@@ -1132,6 +1132,16 @@ static int handle_output_buffer(struct msm_vidc_inst *inst,
 
 	core = inst->core;
 
+	/* iris2 firmware marks the end of a DRC with the drain last flag */
+	if (is_decode_session(inst) &&
+	    (buffer->flags & HFI_BUF_FW_FLAG_LAST) &&
+	    is_sub_state(inst, MSM_VIDC_DRC) &&
+	    is_sub_state(inst, MSM_VIDC_INPUT_PAUSE) &&
+	    !is_sub_state(inst, MSM_VIDC_DRC_LAST_BUFFER)) {
+		buffer->flags &= ~HFI_BUF_FW_FLAG_LAST;
+		buffer->flags |= HFI_BUF_FW_FLAG_PSC_LAST;
+	}
+
 	/* handle drain last flag buffer */
 	if (buffer->flags & HFI_BUF_FW_FLAG_LAST) {
 		rc = handle_drain_last_flag_buffer(inst, buffer);
