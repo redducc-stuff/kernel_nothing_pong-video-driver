@@ -1667,6 +1667,19 @@ int venus_hfi_session_resume(struct msm_vidc_inst *inst,
 		return -EINVAL;
 	}
 
+#if IS_ENABLED(CONFIG_MSM_VIDC_WAIPIO)
+	/* iris2 firmware rejects a resume that carries a payload */
+	rc = venus_hfi_session_command(inst,
+				HFI_CMD_RESUME,
+				(HFI_HOST_FLAGS_RESPONSE_REQUIRED |
+				HFI_HOST_FLAGS_INTR_REQUIRED),
+				get_hfi_port(inst, port),
+				inst->session_id,
+				HFI_PAYLOAD_NONE,
+				NULL,
+				0,
+				__func__);
+#else
 	rc = venus_hfi_session_command(inst,
 				HFI_CMD_RESUME,
 				(HFI_HOST_FLAGS_RESPONSE_REQUIRED |
@@ -1677,6 +1690,7 @@ int venus_hfi_session_resume(struct msm_vidc_inst *inst,
 				&payload,
 				sizeof(u32),
 				__func__);
+#endif
 	if (rc)
 		return rc;
 
